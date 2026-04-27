@@ -5,3 +5,4 @@ dist/
 *.local
 *.enc
 .guardian-key
+backup-log.json
