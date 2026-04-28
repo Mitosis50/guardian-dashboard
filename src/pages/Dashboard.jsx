@@ -3,44 +3,51 @@ import AppHeader from '../components/AppHeader'
 import AgentCard from '../components/AgentCard'
 import { useAuth } from '../components/AuthProvider'
 import { mockBackups } from '../data/mockBackups'
-import { hasSupabaseConfig, supabase } from '../lib/supabase'
+import { hasSupabaseConfig } from '../lib/supabase'
+import { getAgents, getTier } from '../lib/api'
 import { tierLabel } from '../lib/format'
 
 export default function Dashboard() {
-  const { user, profile } = useAuth()
-  const [backups, setBackups] = useState(mockBackups)
+  const { user } = useAuth()
+  const [backups, setBackups] = useState(hasSupabaseConfig ? [] : mockBackups)
+  const [tier, setTier] = useState('free')
   const [loading, setLoading] = useState(hasSupabaseConfig)
   const [usingMock, setUsingMock] = useState(!hasSupabaseConfig)
-  const tier = profile?.tier ?? 'free'
 
   useEffect(() => {
-    async function loadBackups() {
-      if (!hasSupabaseConfig || !user?.id) return
+    async function loadData() {
+      if (!hasSupabaseConfig || !user?.email) return
       setLoading(true)
-      const { data, error } = await supabase
-        .from('agent_backups')
-        .select('id,user_id,file_name,cid,ipfs_url,status,backed_up_at')
-        .eq('user_id', user.id)
-        .order('backed_up_at', { ascending: false })
-
-      if (error) {
-        console.warn('Backup load failed; showing mock data.', error.message)
+      try {
+        const [agents, userTier] = await Promise.all([
+          getAgents(user.email),
+          getTier(user.email),
+        ])
+        setBackups(agents.length ? agents : [])
+        setTier(userTier)
+        setUsingMock(false)
+      } catch (err) {
+        console.warn('Data load failed; showing mock data.', err?.message)
         setBackups(mockBackups)
         setUsingMock(true)
-      } else {
-        setBackups(data?.length ? data : [])
-        setUsingMock(false)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
-    loadBackups()
-  }, [user?.id])
+    loadData()
+  }, [user?.email])
 
   return (
     <div className="min-h-screen text-slate-100">
       <AppHeader />
       <main className="mx-auto max-w-6xl px-4 py-8">
+        {usingMock && (
+          <div className="mb-5 rounded-xl border border-yellow-400/40 bg-yellow-400/10 px-4 py-3 text-sm text-yellow-200">
+            ⚠️ Demo mode — connect Supabase to see live data
+          </div>
+        )}
+
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-sky-300">Dashboard</p>
@@ -52,8 +59,6 @@ export default function Dashboard() {
             <div className="mt-1 text-xl font-bold text-sky-200">{tierLabel(tier)}</div>
           </div>
         </div>
-
-        {usingMock && <div className="mb-5 rounded-xl border border-sky-400/20 bg-sky-400/10 p-4 text-sm text-sky-100">Showing realistic mock data. Add Supabase env vars and run the migration to load real backups.</div>}
 
         {loading ? (
           <p className="text-slate-400">Loading backups…</p>
