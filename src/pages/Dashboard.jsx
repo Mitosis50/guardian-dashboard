@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import AppHeader from '../components/AppHeader'
 import AgentCard from '../components/AgentCard'
+import HealthPanel from '../components/HealthPanel'
 import { useAuth } from '../components/AuthProvider'
 import { mockBackups } from '../data/mockBackups'
 import { hasSupabaseConfig } from '../lib/supabase'
@@ -59,6 +60,8 @@ export default function Dashboard() {
             <div className="mt-1 text-xl font-bold text-sky-200">{tierLabel(tier)}</div>
           </div>
         </div>
+
+        <HealthPanel />
 
         {loading ? (
           <p className="text-slate-400">Loading backups…</p>

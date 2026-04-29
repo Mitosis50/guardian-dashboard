@@ -18,7 +18,8 @@ export function nextBackupTime(lastBackup, tier = 'free') {
   const hoursByTier = {
     free: 24,
     guardian: 6,
-    guardian_pro: 1,
+    pro: 1,
+    lifetime: 1,
   }
   const hours = hoursByTier[tier] ?? 24
   return formatDateTime(new Date(new Date(lastBackup).getTime() + hours * 60 * 60 * 1000))
@@ -28,6 +29,7 @@ export function tierLabel(tier = 'free') {
   return {
     free: 'Free',
     guardian: 'Guardian',
-    guardian_pro: 'Guardian Pro',
+    pro: 'Pro',
+    lifetime: 'Lifetime',
   }[tier] ?? 'Free'
 }
