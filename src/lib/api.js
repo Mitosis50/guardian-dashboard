@@ -34,6 +34,26 @@ export async function getBackendHealth() {
   }
 }
 
+export async function getBackendMetrics() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/metrics`, { cache: 'no-store' })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return { ok: true, data: await res.json() }
+  } catch (err) {
+    return { ok: false, error: err?.message || 'Metrics check failed' }
+  }
+}
+
+export async function getHealthValidation() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/validate-health`, { cache: 'no-store' })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return { ok: true, data: await res.json() }
+  } catch (err) {
+    return { ok: false, error: err?.message || 'Health validation failed' }
+  }
+}
+
 export async function getAppHealth() {
   if (typeof window === 'undefined' || !window.guardian?.getHealth) {
     return { ok: false, unavailable: true, error: 'Open Agent Guardian desktop app to see local cron heartbeat.' }
