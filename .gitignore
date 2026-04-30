@@ -6,3 +6,4 @@ dist/
 *.enc
 .guardian-key
 backup-log.json
+.vercel
