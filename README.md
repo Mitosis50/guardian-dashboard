@@ -1,4 +1,4 @@
-# Agent Guardian Dashboard — Phase 2
+# Agent Guardian Dashboard — Phase 3
 
 Browser dashboard for Agent Guardian at `agentbotguardian.com`.
 
@@ -40,9 +40,10 @@ Create `.env`:
 ```bash
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_API_URL=https://your-guardian-api.up.railway.app
 ```
 
-Both are safe client-side Supabase values. Do **not** put service-role keys in this Vite app.
+The Supabase values are safe client-side values. `VITE_API_URL` points the dashboard at the live Guardian API. Do **not** put service-role keys in this Vite app.
 
 ## Supabase Setup
 
@@ -76,10 +77,7 @@ It also enables RLS so users can only read/write their own profile/backups.
 
 ## Mock Data Behavior
 
-The app shows mock data when:
-
-- `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` is missing, or
-- Supabase table reads fail during demo/dev.
+The app shows mock data only when `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` is missing. When Supabase is configured, the dashboard uses the signed-in user's Supabase session token to call the live Guardian API and displays explicit auth/API error states instead of silently falling back to mock data.
 
 Mock cards:
 
@@ -97,11 +95,21 @@ Mock cards:
 6. Add env vars in Vercel project settings:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_API_URL` — the Railway Guardian API base URL, with no trailing slash preferred
 7. Add `https://agentbotguardian.com/dashboard` and any Vercel preview callback URLs to Supabase auth redirect URLs.
 8. Deploy.
 
 `vercel.json` is included with an SPA rewrite to support direct visits to `/login`, `/dashboard`, and `/history`.
 
-## Notes for Phase 3
+## Phase 3 Live API Path
 
-No backend server is included yet. Reads/writes go directly from the browser to Supabase. Backup creation can later be connected to the Phase 1 API or the existing `guardian-core` jobs that produce real Pinata CIDs.
+Authenticated dashboard reads now go through the Guardian API instead of direct browser database reads:
+
+1. Supabase magic-link login creates a browser session.
+2. The dashboard sends `Authorization: Bearer <supabase-access-token>` to:
+   - `GET /api/agents/:email`
+   - `GET /api/tier/:email`
+3. The API validates the token with Supabase, confirms the requested email matches the authenticated user, then reads trusted Guardian data.
+4. The dashboard renders live backups, empty states, or explicit session/API errors.
+
+Required backend support: `SUPABASE_URL` plus `SUPABASE_SERVICE_ROLE_KEY` on the Guardian API deployment.
