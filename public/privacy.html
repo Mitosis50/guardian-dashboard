@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — Agent Guardian</title>
+  <meta name="description" content="Agent Guardian privacy policy for encrypted, self-custody AI agent backups." />
+  <meta property="og:title" content="Privacy Policy — Agent Guardian" />
+  <meta property="og:description" content="How Agent Guardian handles encrypted backups, email addresses, and backup metadata." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://agentbotguardian.com/privacy" />
+  <meta name="twitter:card" content="summary" />
+  <style>
+    :root { color-scheme: dark; --bg:#060b14; --panel:#0b1220; --text:#eef6ff; --muted:#9fb0c8; --sky:#38bdf8; --border:rgba(148,163,184,.22); }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--text); background: radial-gradient(circle at 20% 0%, rgba(56,189,248,.18), transparent 32rem), var(--bg); line-height:1.65; }
+    main { width:min(880px, calc(100% - 40px)); margin:0 auto; padding:56px 0 72px; }
+    a { color:var(--sky); }
+    .back { display:inline-block; margin-bottom:28px; color:var(--muted); text-decoration:none; }
+    h1 { font-size:clamp(2.2rem, 7vw, 4rem); line-height:1; margin:0 0 12px; }
+    h2 { margin-top:36px; color:#dff7ff; }
+    p, li { color:var(--muted); }
+    .card { border:1px solid var(--border); background:rgba(15,23,42,.74); border-radius:24px; padding:24px; margin:24px 0; }
+    .updated { color:var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="/">← Back to Agent Guardian</a>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: May 6, 2026</p>
+
+    <div class="card">
+      <p><strong>Plain-English summary:</strong> Agent Guardian is designed for self-custody encrypted backups. Your selected agent files are encrypted locally before upload. We do not need your plaintext files or recovery key to provide the service.</p>
+    </div>
+
+    <h2>What Agent Guardian backs up</h2>
+    <p>Agent Guardian watches user-selected AI agent files and creates encrypted backup artifacts. Encryption happens on your device before network transmission.</p>
+
+    <h2>Information we may process</h2>
+    <ul>
+      <li>Email address used for account, tier, purchase, or backup lookup.</li>
+      <li>Backup metadata such as file name, timestamp, size, tier, and IPFS content identifier (CID).</li>
+      <li>Payment and purchase metadata received from Gumroad, such as product permalink, sale ID, tier, and refund/cancellation status if provided.</li>
+      <li>Operational logs needed to maintain the API and troubleshoot failures.</li>
+    </ul>
+
+    <h2>What we do not want</h2>
+    <p>Agent Guardian is not intended for protected health information (PHI), regulated medical records, payment card data, government identifiers, or other regulated data unless separate safeguards, consent, business agreements, retention rules, access controls, and audit procedures are in place.</p>
+
+    <h2>Encryption and self-custody</h2>
+    <p>Agent Guardian uses local encryption before upload. No plaintext should leave your device during normal backup operation. Your recovery key is self-custodied. If you lose the recovery key, Agent Guardian cannot decrypt or recover your backups for you.</p>
+
+    <h2>IPFS and storage providers</h2>
+    <p>Encrypted backup artifacts may be pinned to IPFS through infrastructure providers. IPFS CIDs are content-addressed receipts for encrypted data, not proof that plaintext is public. Storage availability depends on pinning, gateway availability, and account/service continuity.</p>
+
+    <h2>Security limits</h2>
+    <p>No system can guarantee perfect uptime, permanent storage, or recovery without the correct key. Agent Guardian is designed to reduce agent-file data-loss risk, not eliminate all operational, provider, device, or user-key risks.</p>
+
+    <h2>Support and deletion requests</h2>
+    <p>For support or privacy requests, contact <a href="mailto:support@agentbotguardian.com">support@agentbotguardian.com</a>. Support mailbox verification remains part of launch readiness and should be confirmed before public marketing.</p>
+
+    <h2>Changes</h2>
+    <p>We may update this policy as Agent Guardian evolves. The current policy will be posted at this page.</p>
+  </main>
+</body>
+</html>
