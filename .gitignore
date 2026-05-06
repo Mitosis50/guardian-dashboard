@@ -7,3 +7,16 @@ dist/
 .guardian-key
 backup-log.json
 .vercel
+
+# Hero8 Agent Guardian safety ignores
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.p8
+*.mobileprovision
+._*
+build/
+coverage/
+.cache/
