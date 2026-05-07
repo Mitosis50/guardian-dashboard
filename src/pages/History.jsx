@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ExternalLink, Loader2 } from 'lucide-react'
 import AppHeader from '../components/AppHeader'
 import StatusBadge from '../components/StatusBadge'
+import RestoreButton from '../components/RestoreButton'
 import { useAuth } from '../components/AuthProvider'
 import { hasSupabaseConfig } from '../lib/supabase'
 import { getHistory } from '../lib/api'
@@ -130,6 +131,7 @@ export default function History() {
                     <th className="px-5 py-4">Backup Date/Time</th>
                     <th className="px-5 py-4">CID</th>
                     <th className="px-5 py-4">IPFS Link</th>
+                    <th className="px-5 py-4">Restore</th>
                     <th className="px-5 py-4">Status</th>
                   </tr>
                 </thead>
@@ -144,6 +146,7 @@ export default function History() {
                           Open <ExternalLink size={14} />
                         </a>
                       </td>
+                      <td className="px-5 py-4"><RestoreButton backup={backup} /></td>
                       <td className="px-5 py-4"><StatusBadge status={backup.status} /></td>
                     </tr>
                   ))}
