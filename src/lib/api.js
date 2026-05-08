@@ -185,3 +185,60 @@ export async function triggerDesktopBackup(email, accessToken) {
     throw new Error(err?.message || 'Failed to trigger backup from desktop app')
   }
 }
+
+// Analytics API functions
+export async function getAnalyticsMetrics(email, accessToken) {
+  const response = await fetch(`${BASE_URL}/api/analytics/metrics?email=${encodeURIComponent(email)}`, {
+    cache: 'no-store',
+    headers: authHeaders(accessToken)
+  })
+  if (!response.ok) throw new Error('Failed to fetch analytics metrics')
+  return response.json()
+}
+
+export async function getUsageTrends(days = 30, accessToken) {
+  const response = await fetch(`${BASE_URL}/api/analytics/usage-trends?days=${days}`, {
+    cache: 'no-store',
+    headers: authHeaders(accessToken)
+  })
+  if (!response.ok) throw new Error('Failed to fetch usage trends')
+  return response.json()
+}
+
+export async function getStorageByTier(accessToken) {
+  const response = await fetch(`${BASE_URL}/api/analytics/storage-by-tier`, {
+    cache: 'no-store',
+    headers: authHeaders(accessToken)
+  })
+  if (!response.ok) throw new Error('Failed to fetch storage breakdown')
+  return response.json()
+}
+
+// Webhook API functions
+export async function createWebhookSubscription(source, event_types, trigger_action, config = {}, accessToken) {
+  const response = await fetch(`${BASE_URL}/api/webhooks/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(accessToken) },
+    body: JSON.stringify({ source, event_types, trigger_action, config }),
+  })
+  if (!response.ok) throw new Error('Failed to create subscription')
+  return response.json()
+}
+
+export async function getWebhookSubscriptions(accessToken) {
+  const response = await fetch(`${BASE_URL}/api/webhooks/subscriptions`, {
+    cache: 'no-store',
+    headers: authHeaders(accessToken)
+  })
+  if (!response.ok) throw new Error('Failed to fetch subscriptions')
+  return response.json()
+}
+
+export async function deleteWebhookSubscription(id, accessToken) {
+  const response = await fetch(`${BASE_URL}/api/webhooks/subscriptions/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(accessToken)
+  })
+  if (!response.ok) throw new Error('Failed to delete subscription')
+  return response.json()
+}
