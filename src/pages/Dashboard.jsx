@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Loader2, RefreshCw } from 'lucide-react'
 import AppHeader from '../components/AppHeader'
+import AppStatus from '../components/AppStatus'
 import AgentCard from '../components/AgentCard'
 import HealthPanel from '../components/HealthPanel'
+import TierBadge from '../components/TierBadge'
+import LicenseModal from '../components/LicenseModal'
+import OnboardingWizard from '../components/OnboardingWizard'
 import { useAuth } from '../components/AuthProvider'
 import { mockBackups } from '../data/mockBackups'
 import { hasSupabaseConfig } from '../lib/supabase'
 import { getAgents, getTier } from '../lib/api'
 import { tierLabel } from '../lib/format'
+import { getTierConfig, hasBackupSpace, backupsRemaining } from '../lib/tiers'
 
 function StateMessage({ tone = 'slate', title, children }) {
   const tones = {
@@ -32,6 +37,8 @@ export default function Dashboard() {
   const [apiError, setApiError] = useState(null)
   const [errorCode, setErrorCode] = useState(null)
   const [usingMock, setUsingMock] = useState(!hasSupabaseConfig)
+  const [licenseModalOpen, setLicenseModalOpen] = useState(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
 
   async function loadData() {
     setApiError(null)
@@ -104,9 +111,13 @@ export default function Dashboard() {
     return () => { cancelled = true }
   }, [authLoading, session?.access_token, user?.email, sessionValid])
 
+  const tierConfig = getTierConfig(tier)
+  const atLimit = !hasBackupSpace(tier, backups.length)
+  const remaining = backupsRemaining(tier, backups.length)
+
   return (
     <div className="min-h-screen text-slate-100">
-      <AppHeader />
+      <AppHeader onOpenOnboarding={() => setOnboardingOpen(true)} />
       <main className="mx-auto max-w-6xl px-4 py-8">
         {!isConfigured && (
           <StateMessage tone="yellow" title="Demo mode">
@@ -129,17 +140,54 @@ export default function Dashboard() {
           </StateMessage>
         )}
 
+        {/* Tier limit warning */}
+        {isConfigured && atLimit && (
+          <StateMessage tone="yellow" title="Backup limit reached">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span>
+                You’ve reached the {tierConfig.maxBackups} backup limit on the {tierLabel(tier)} plan.
+              </span>
+              <button
+                onClick={() => setLicenseModalOpen(true)}
+                className="inline-flex items-center gap-1.5 self-start rounded-lg border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-100 transition-colors hover:bg-amber-400/20 sm:self-auto"
+              >
+                Upgrade to add more
+              </button>
+            </div>
+          </StateMessage>
+        )}
+
+        {/* Near limit notice */}
+        {isConfigured && !atLimit && remaining !== Infinity && remaining <= 1 && (
+          <StateMessage tone="sky" title="Almost at your limit">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span>
+                You have {remaining} backup slot remaining on the {tierLabel(tier)} plan.
+              </span>
+              <button
+                onClick={() => setLicenseModalOpen(true)}
+                className="inline-flex items-center gap-1.5 self-start rounded-lg border border-sky-300/30 bg-sky-400/10 px-3 py-1.5 text-xs font-medium text-sky-100 transition-colors hover:bg-sky-400/20 sm:self-auto"
+              >
+                Upgrade
+              </button>
+            </div>
+          </StateMessage>
+        )}
+
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-sky-300">Dashboard</p>
             <h1 className="mt-2 text-3xl font-bold text-white">Protected agent backups</h1>
             <p className="mt-2 max-w-2xl text-slate-400">Monitor pinned `.md` agent files, backup status, and IPFS recovery links.</p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4">
-            <div className="text-xs uppercase tracking-wide text-slate-500">Current plan</div>
-            <div className="mt-1 text-xl font-bold text-sky-200">{tierLabel(tier)}</div>
-          </div>
+          <TierBadge tier={tier} onActivate={() => setLicenseModalOpen(true)} />
         </div>
+
+        {isConfigured && user?.email && session?.access_token && (
+          <div className="mb-8">
+            <AppStatus email={user.email} accessToken={session.access_token} tier={tier} />
+          </div>
+        )}
 
         <HealthPanel />
 
@@ -163,6 +211,24 @@ export default function Dashboard() {
           </section>
         )}
       </main>
+
+      <LicenseModal
+        open={licenseModalOpen}
+        onClose={() => setLicenseModalOpen(false)}
+        onActivated={(newTier) => {
+          setTier(newTier)
+          loadData()
+        }}
+      />
+
+      <OnboardingWizard
+        open={onboardingOpen}
+        onClose={() => setOnboardingOpen(false)}
+        onComplete={() => {
+          setOnboardingOpen(false)
+          loadData()
+        }}
+      />
     </div>
   )
 }

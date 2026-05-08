@@ -3,6 +3,7 @@ const MAGIC_BYTES = new TextEncoder().encode(MAGIC)
 const IV_LEN = 12
 const TAG_LEN = 16
 const HEADER_LEN = MAGIC_BYTES.length + IV_LEN + TAG_LEN
+const ARWEAVE_GATEWAY = 'https://arweave.net'
 
 function bytesEqual(a, b) {
   if (a.length !== b.length) return false
@@ -58,6 +59,13 @@ export async function decryptGuardianEncryptedBuffer(encryptedBuffer, keyBytes) 
 export async function fetchEncryptedBackup(ipfsUrl) {
   const res = await fetch(ipfsUrl, { cache: 'no-store' })
   if (!res.ok) throw new Error(`Could not fetch encrypted backup: HTTP ${res.status}`)
+  return res.arrayBuffer()
+}
+
+export async function fetchArweaveBackup(txId) {
+  const url = `${ARWEAVE_GATEWAY}/${txId}`
+  const res = await fetch(url, { cache: 'no-store' })
+  if (!res.ok) throw new Error(`Could not fetch from Arweave: HTTP ${res.status}`)
   return res.arrayBuffer()
 }
 

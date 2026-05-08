@@ -58,12 +58,16 @@ async function fetchWithRetry(url, options, retries = MAX_RETRIES) {
 function normalizeBackup(row) {
   const cid = row?.cid || row?.ipfs_cid || row?.hash || ''
   const fileName = row?.file_name || row?.filename || row?.path || row?.name || 'Agent config'
+  const arweaveTxId = row?.arweave_tx_id || row?.arweave_txid || row?.arweave_id || ''
   return {
     ...row,
     id: row?.id || cid || `${fileName}-${row?.created_at || row?.backed_up_at || ''}`,
     file_name: fileName,
     backed_up_at: row?.backed_up_at || row?.created_at || row?.updated_at || null,
+    cid,
+    arweave_tx_id: arweaveTxId,
     ipfs_url: row?.ipfs_url || row?.url || (cid ? `https://gateway.pinata.cloud/ipfs/${cid}` : '#'),
+    arweave_url: arweaveTxId ? `https://arweave.net/${arweaveTxId}` : '',
     status: row?.status || (row?.deleted ? 'deleted' : 'protected'),
   }
 }
@@ -132,5 +136,52 @@ export async function getAppHealth() {
     return { ok: true, data: await window.guardian.getHealth() }
   } catch (err) {
     return { ok: false, error: err?.message || 'Local app health unavailable', code: 'unknown' }
+  }
+}
+
+export async function activateLicense(email, licenseKey, accessToken) {
+  const payload = await fetchWithRetry(
+    `${BASE_URL}/api/activate`,
+    {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'content-type': 'application/json',
+        ...authHeaders(accessToken),
+      },
+      body: JSON.stringify({ email, license_key: licenseKey }),
+    }
+  )
+  return payload?.data ?? payload
+}
+
+export async function getDesktopHeartbeat(email, accessToken) {
+  try {
+    const payload = await fetchWithRetry(
+      `${BASE_URL}/api/heartbeat/${encodeURIComponent(email)}`,
+      { cache: 'no-store', headers: authHeaders(accessToken) }
+    )
+    return {
+      ok: true,
+      data: payload?.data ?? payload,
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      error: err?.message || 'Failed to fetch heartbeat',
+      code: err?.code || 'unknown',
+    }
+  }
+}
+
+export async function triggerDesktopBackup(email, accessToken) {
+  if (typeof window === 'undefined' || !window.guardian?.uploadNowRemote) {
+    throw new Error('Desktop app not available. Please ensure Agent Guardian is running.')
+  }
+  try {
+    const result = await window.guardian.uploadNowRemote()
+    return { ok: true, data: result }
+  } catch (err) {
+    throw new Error(err?.message || 'Failed to trigger backup from desktop app')
   }
 }
