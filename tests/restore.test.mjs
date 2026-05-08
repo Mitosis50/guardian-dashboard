@@ -47,4 +47,15 @@ for (const fileName of ['landing.html', 'index-landing.html']) {
     assert.match(html, /<section[^>]+id="trust"/)
     assert.ok(html.includes(homepageTrustCopy))
   })
+
+  test(`${fileName} positions pricing around entry, recovery premium, and founder fair use`, () => {
+    const html = fs.readFileSync(path.join(process.cwd(), 'public', fileName), 'utf8')
+    assert.ok(html.includes('<div class="price">$9/mo</div>'))
+    assert.ok(html.includes('Paid entry point for encrypted agent recovery'))
+    assert.ok(html.includes('<div class="price">$19/mo</div>'))
+    assert.ok(html.includes('Security + recovery premium'))
+    assert.ok(html.includes('Priority recovery support'))
+    assert.ok(html.includes('Founder deal — fair use applies'))
+    assert.ok(html.includes('Fair-use encrypted storage/versioning'))
+  })
 }
