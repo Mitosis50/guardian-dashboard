@@ -62,7 +62,8 @@ for (const fileName of ['landing.html', 'index-landing.html']) {
     assert.ok(html.includes('Priority recovery support'))
     assert.ok(html.includes('Recovery ledger for faster restore audits'))
     assert.ok(html.includes('Founder deal — fair use applies'))
-    assert.ok(html.includes('30-day version history under fair use'))
+    assert.ok(!html.includes('30-day version history under fair use'))
+    assert.ok(html.includes('Founder priority access'))
     assert.ok(html.includes('Fair-use encrypted storage/versioning'))
   })
 }
