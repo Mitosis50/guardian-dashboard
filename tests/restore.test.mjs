@@ -66,4 +66,14 @@ for (const fileName of ['landing.html', 'index-landing.html']) {
     assert.ok(html.includes('Founder priority access'))
     assert.ok(html.includes('Fair-use encrypted storage/versioning'))
   })
+
+  test(`${fileName} qualifies Arweave as optional and avoids permanent claims in BCI section`, () => {
+    const html = fs.readFileSync(path.join(process.cwd(), 'public', fileName), 'utf8')
+    const bciMatch = html.match(/<p class="frontier-body">([\s\S]*?)<\/p>/)
+    assert.ok(bciMatch, 'expected a frontier-body paragraph')
+    const bciText = bciMatch[1]
+    assert.ok(bciText.includes('durable'), 'expected "durable" in BCI paragraph')
+    assert.ok(bciText.includes('optional Arweave archival'), 'expected "optional Arweave archival" in BCI paragraph')
+    assert.ok(!bciText.includes('Permanent'), 'expected no "Permanent" claim in BCI paragraph')
+  })
 }
