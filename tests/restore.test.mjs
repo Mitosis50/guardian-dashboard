@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict'
 import crypto from 'node:crypto'
+import fs from 'node:fs'
+import path from 'node:path'
 import test from 'node:test'
 
 import { decryptGuardianEncryptedBuffer, restoredFileName } from '../src/lib/restore.js'
@@ -35,3 +37,14 @@ test('restore download names remove encryption suffix and timestamp prefix', () 
   assert.equal(restoredFileName('1715000000000-agent.md.enc'), 'agent.md')
   assert.equal(restoredFileName('agent.md.enc'), 'agent.md')
 })
+
+const homepageTrustCopy =
+  'Agent Guardian encrypts your agent .md config files locally with AES-256-GCM before backup. IPFS/Arweave store ciphertext, not readable configs. Designed for recovery even when agents, gateways, or local machines fail.'
+
+for (const fileName of ['landing.html', 'index-landing.html']) {
+  test(`${fileName} includes homepage trust block with local encryption and ciphertext copy`, () => {
+    const html = fs.readFileSync(path.join(process.cwd(), 'public', fileName), 'utf8')
+    assert.match(html, /<section[^>]+id="trust"/)
+    assert.ok(html.includes(homepageTrustCopy))
+  })
+}

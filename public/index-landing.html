@@ -276,6 +276,35 @@
       padding: 8px 11px;
     }
 
+    .homepage-trust-card {
+      max-width: 980px;
+      margin: 0 auto;
+      border-color: rgba(125, 211, 252, 0.26);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.16), transparent 18rem),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.64));
+    }
+
+    .homepage-trust-label {
+      position: relative;
+      margin: 0 0 12px;
+      color: var(--sky-soft);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .homepage-trust-copy {
+      position: relative;
+      margin: 0;
+      color: #e0f2fe;
+      font-size: clamp(1.08rem, 1.8vw, 1.34rem);
+      font-weight: 700;
+      line-height: 1.62;
+      letter-spacing: -0.025em;
+    }
+
     .agent-line {
       max-width: 690px;
       margin: -18px 0 32px;
@@ -1224,6 +1253,15 @@
         <div class="orbit-card" aria-label="Animated solar system representing protected agent files">
           <canvas id="solar-system"></canvas>
         </div>
+      </div>
+    </section>
+
+    <section class="section" id="trust" aria-labelledby="trust-title">
+      <div class="wrap">
+        <article class="card homepage-trust-card">
+          <p class="homepage-trust-label" id="trust-title">Local-first encrypted recovery</p>
+          <p class="homepage-trust-copy">Agent Guardian encrypts your agent .md config files locally with AES-256-GCM before backup. IPFS/Arweave store ciphertext, not readable configs. Designed for recovery even when agents, gateways, or local machines fail.</p>
+        </article>
       </div>
     </section>
 
